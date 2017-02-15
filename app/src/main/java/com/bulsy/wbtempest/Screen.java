@@ -32,6 +32,8 @@ public abstract class Screen {
      */
     public abstract boolean onTouch(MotionEvent e);
 
+    public abstract void onRotaryInput(MotionEvent event);
+
     /**
      * returns tru if the inpassed event location is within the inpassed rectangle bounds.
      * @param event

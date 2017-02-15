@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.v4.view.VelocityTrackerCompat;
+import android.support.wearable.input.RotaryEncoder;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -73,7 +74,7 @@ public class PlayScreen extends Screen {
     private boolean crawlerSpiked;
     private List<int[]> starList = null;  // will be created and populated first time around
     int[] xycoords = new int[2];
-//    float[] starpts = new float[NUM_STARS*2];
+    //    float[] starpts = new float[NUM_STARS*2];
     Paint starpaint = new Paint();
     private int height, width, halfheight, halfwidth;
     private int rhstextoffset;
@@ -597,20 +598,20 @@ public class PlayScreen extends Screen {
 //            c.drawText("fps:"+fps, 50, 100, p);
 
             // draw fire buttons
-            p.setARGB(255, 170, 0, 0);
-            c.drawRect(btnFire1Bounds, p);
-            c.drawRect(btnFire2Bounds, p);
-            p.setARGB(200, 100, 80, 80);
-            c.drawRect(btnSuperzapBounds, p);
-            p.setTextSize(act.TS_BIG);
-            p.setColor(Color.BLACK);
-            c.drawText(lblFire, getCenteredBtnX(lblFire, btnFire1Bounds), getCenteredBtnY(lblFire, btnFire1Bounds), p);
-            c.drawText(lblFire, getCenteredBtnX(lblFire, btnFire2Bounds), getCenteredBtnY(lblFire, btnFire2Bounds), p);
-            if (superzaps > 0)
-                p.setColor(Color.RED);
-            else
-                p.setColor(Color.BLACK);
-            c.drawText(lblZap, getCenteredBtnX(lblZap, btnSuperzapBounds), getCenteredBtnY(lblZap, btnSuperzapBounds), p);
+//            p.setARGB(255, 170, 0, 0);
+//            c.drawRect(btnFire1Bounds, p);
+//            c.drawRect(btnFire2Bounds, p);
+//            p.setARGB(200, 100, 80, 80);
+//            c.drawRect(btnSuperzapBounds, p);
+//            p.setTextSize(act.TS_BIG);
+//            p.setColor(Color.BLACK);
+//            c.drawText(lblFire, getCenteredBtnX(lblFire, btnFire1Bounds), getCenteredBtnY(lblFire, btnFire1Bounds), p);
+//            c.drawText(lblFire, getCenteredBtnX(lblFire, btnFire2Bounds), getCenteredBtnY(lblFire, btnFire2Bounds), p);
+//            if (superzaps > 0)
+//                p.setColor(Color.RED);
+//            else
+//                p.setColor(Color.BLACK);
+//            c.drawText(lblZap, getCenteredBtnX(lblZap, btnSuperzapBounds), getCenteredBtnY(lblZap, btnSuperzapBounds), p);
 
             if (levelprep){
                 p.setTextSize(act.TS_NORMAL);
@@ -724,14 +725,14 @@ public class PlayScreen extends Screen {
                 if (m.isVisible()
                         && (m.getColumn() == ex.getColumn() && (Math.abs(m.getZPos() - ex.getZ())< Ex.HEIGHT))
                         || ((m.getColumn() == crawler.getColumn())
-                            && (m.getZPos() <= Missile.HEIGHT) // if we JUST fired the missile and ex is adjacent...
-                            && (ex.getZ() <= 0)
-                            && (!ex.isJumping())
-                            && ( // adjacent fire depends on if the screen is continuous
-                                (((ex.getColumn() +1) == crawler.getColumn()) || ((crawler.getColumn()+1) == ex.getColumn())) ||
+                        && (m.getZPos() <= Missile.HEIGHT) // if we JUST fired the missile and ex is adjacent...
+                        && (ex.getZ() <= 0)
+                        && (!ex.isJumping())
+                        && ( // adjacent fire depends on if the screen is continuous
+                        (((ex.getColumn() +1) == crawler.getColumn()) || ((crawler.getColumn()+1) == ex.getColumn())) ||
                                 ((((ex.getColumn() +1)%ncols == crawler.getColumn()) || ((crawler.getColumn()+1)%ncols == ex.getColumn())) && board.isContinuous())
-                               )
-                           )){
+                )
+                )){
                     //Log.d(act.LOG_ID, "ex hit,  m:"+m.getZPos() + " "+m+" ex:"+ex);
                     if (ex.isPod()) {
                         // this ex is a pod; split into normal exes
@@ -814,33 +815,37 @@ public class PlayScreen extends Screen {
                     act.leaveGame();
                     return false;
                 }
-                int idx = e.getActionIndex();
-                int pid = e.getPointerId(idx);
-                if (e.getY(idx) > buttonLimitLine) {
-                    // user pressing btns, not movement
-                    //Log.d(act.LOG_ID, "BTN DOWN: "+e.getActionMasked()+", "+e.getX(idx)+","+e.getY(idx)+"; idx:"+idx+" pid:"+pid);
-                    if (btnFire1Bounds.contains((int)e.getX(idx), (int)e.getY(idx)) || btnFire2Bounds.contains((int)e.getX(idx), (int)e.getY(idx))) {
-                        // fire!
-                        fireList.add(pid);
-                        fireMissile = true;
-                    }
-                    else if (btnSuperzapBounds.contains((int)e.getX(idx), (int)e.getY(idx))) {
-                        // superzap
-                        fireSuperzapper = true;
-                        return false; // no followups...though...we might get them anyway if this isn;t the original pointer.   this really seems overcomplicated.
-                    }
-                }
-                else {
-                    // crawler movement
-                    mVelocityTracker.clear();
-                    // Add a user's movement to the tracker.
-                    mVelocityTracker.addMovement(e);
-                }
-                break;
+
+                fireSuperzapper = true;
+                return false;
+
+//                int idx = e.getActionIndex();
+//                int pid = e.getPointerId(idx);
+//                if (e.getY(idx) > buttonLimitLine) {
+//                    // user pressing btns, not movement
+//                    //Log.d(act.LOG_ID, "BTN DOWN: "+e.getActionMasked()+", "+e.getX(idx)+","+e.getY(idx)+"; idx:"+idx+" pid:"+pid);
+//                    if (btnFire1Bounds.contains((int)e.getX(idx), (int)e.getY(idx)) || btnFire2Bounds.contains((int)e.getX(idx), (int)e.getY(idx))) {
+//                        // fire!
+//                        fireList.add(pid);
+//                        fireMissile = true;
+//                    }
+//                    else if (btnSuperzapBounds.contains((int)e.getX(idx), (int)e.getY(idx))) {
+//                        // superzap
+//                        fireSuperzapper = true;
+//                        return false; // no followups...though...we might get them anyway if this isn;t the original pointer.   this really seems overcomplicated.
+//                    }
+//                }
+//                else {
+//                    // crawler movement
+//                    mVelocityTracker.clear();
+//                    // Add a user's movement to the tracker.
+//                    mVelocityTracker.addMovement(e);
+//                }
+//                break;
 
             case MotionEvent.ACTION_MOVE:
                 for (int i = 0; i < e.getPointerCount(); i++) {
-                    pid = e.getPointerId(i);
+                    int pid = e.getPointerId(i);
                     if (!fireList.contains(pid)) {
                         // user is moving crawler
                         //Log.d(act.LOG_ID, "MOVE, dial; pid " + pid);
@@ -860,29 +865,18 @@ public class PlayScreen extends Screen {
                             float tvx = VelocityTrackerCompat.getXVelocity(mVelocityTracker, pid);
                             float tvy = VelocityTrackerCompat.getYVelocity(mVelocityTracker, pid);
 
-                                if (tvx == 0)
-                                    tvx = 0.001f;
-                                double velmag = Math.sqrt(Math.pow(tvx, 2) + Math.pow(tvy, 2));
-                                double veldir = Math.atan(tvy / tvx);
-                                if (tvx < 0)
-                                    veldir += Math.PI;
-                                double alignedComponentFactor = Math.cos(veldir - posnormdir);
-                                double fact = alignedComponentFactor * velmag / MAX_VEL;
-                                crawler.accel(fact);
+                            if (tvx == 0)
+                                tvx = 0.001f;
+                            double velmag = Math.sqrt(Math.pow(tvx, 2) + Math.pow(tvy, 2));
+                            double veldir = Math.atan(tvy / tvx);
+                            if (tvx < 0)
+                                veldir += Math.PI;
+                            double alignedComponentFactor = Math.cos(veldir - posnormdir);
+                            double fact = alignedComponentFactor * velmag / MAX_VEL;
+                            crawler.accel(fact);
 //                                info = String.format("acf:%.2f veld:%.2f\tposnd:%.2f\tvelmag:%d",
 //                                        (float) alignedComponentFactor, (float) veldir, (float) posnormdir, (int) velmag);
                         }
-/*
-                        // alternative screen control - cheaper but feels more spastic
-                        float xfact = -effy/halfheight;
-                        float yfact = effx/halfwidth;
-                        mVelocityTracker.computeCurrentVelocity(1000);
-                        float tvx = VelocityTrackerCompat.getXVelocity(mVelocityTracker, pid);
-                        float tvy = VelocityTrackerCompat.getYVelocity(mVelocityTracker, pid);
-                        double fact = (tvx*xfact + tvy*yfact)/(MAX_VEL/4);
-                        crawler.accel(fact);
-*/
-
                     }
                 }
                 break;
@@ -906,5 +900,19 @@ public class PlayScreen extends Screen {
         }
 
         return true;
+    }
+
+    @Override
+    public void onRotaryInput(MotionEvent event) {
+
+        float delta = -RotaryEncoder.getRotaryAxisValue(event)
+                * RotaryEncoder.getScaledScrollFactor(PlayScreen.this.act);
+
+        crawler.accel(delta / 50);
+
+        int idx = event.getActionIndex();
+        int pid = event.getPointerId(idx);
+        fireList.add(pid);
+        fireMissile = true;
     }
 }

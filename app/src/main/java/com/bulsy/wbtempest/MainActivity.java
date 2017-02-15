@@ -8,6 +8,8 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.wearable.activity.WearableActivity;
+import android.support.wearable.input.RotaryEncoder;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -22,7 +24,7 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends WearableActivity {
     static final String LOG_ID = "wbt";
     private static final float EXPECTED_DENSITY = 315.0f;  // original target density of runtime device
     private static final float EXPECTED_WIDTH_PIX = 720.0f;  // original target width of runtime device
@@ -36,8 +38,8 @@ public class MainActivity extends ActionBarActivity {
     FullScreenView mainView;
     Typeface gamefont;
     float sizescalefactor; // scaling factor for current device screen, compared to expected/development screen
-    public SoundPool soundpool = null;
-    Map<Sound, Integer> soundMap = null;
+    //    public SoundPool soundpool = null;
+//    Map<Sound, Integer> soundMap = null;
     DisplayMetrics metrics;
     int maxStartLevel = 1;
     String lblSelectStartScr;
@@ -49,7 +51,6 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         try {
-            supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
             super.onCreate(savedInstanceState);
@@ -85,23 +86,23 @@ public class MainActivity extends ActionBarActivity {
             setContentView(mainView);
 
             // set up sounds
-            setVolumeControlStream(AudioManager.STREAM_MUSIC);
-            soundpool = new SoundPool(20, AudioManager.STREAM_MUSIC, 0);
-            soundMap = new HashMap();
-            AssetFileDescriptor descriptor = getAssets().openFd("fire.mp3");
-            soundMap.put(Sound.FIRE, soundpool.load(descriptor, 1));
-            descriptor = getAssets().openFd("enemyfire.mp3");
-            soundMap.put(Sound.ENEMYFIRE, soundpool.load(descriptor, 1));
-            descriptor = getAssets().openFd("crawlding.mp3");
-            soundMap.put(Sound.CRAWLERMOVE, soundpool.load(descriptor, 1));
-            descriptor = getAssets().openFd("crawldeath.mp3");
-            soundMap.put(Sound.CRAWLERDEATH, soundpool.load(descriptor, 1));
-            descriptor = getAssets().openFd("enemydeath.mp3");
-            soundMap.put(Sound.ENEMYDEATH, soundpool.load(descriptor, 1));
-            descriptor = getAssets().openFd("levchg1.mp3");
-            soundMap.put(Sound.LEVCHG, soundpool.load(descriptor, 1));
-            descriptor = getAssets().openFd("exlife.mp3");
-            soundMap.put(Sound.EXLIFE, soundpool.load(descriptor, 1));
+//            setVolumeControlStream(AudioManager.STREAM_MUSIC);
+//            soundpool = new SoundPool(20, AudioManager.STREAM_MUSIC, 0);
+//            soundMap = new HashMap();
+//            AssetFileDescriptor descriptor = getAssets().openFd("fire.mp3");
+//            soundMap.put(Sound.FIRE, soundpool.load(descriptor, 1));
+//            descriptor = getAssets().openFd("enemyfire.mp3");
+//            soundMap.put(Sound.ENEMYFIRE, soundpool.load(descriptor, 1));
+//            descriptor = getAssets().openFd("crawlding.mp3");
+//            soundMap.put(Sound.CRAWLERMOVE, soundpool.load(descriptor, 1));
+//            descriptor = getAssets().openFd("crawldeath.mp3");
+//            soundMap.put(Sound.CRAWLERDEATH, soundpool.load(descriptor, 1));
+//            descriptor = getAssets().openFd("enemydeath.mp3");
+//            soundMap.put(Sound.ENEMYDEATH, soundpool.load(descriptor, 1));
+//            descriptor = getAssets().openFd("levchg1.mp3");
+//            soundMap.put(Sound.LEVCHG, soundpool.load(descriptor, 1));
+//            descriptor = getAssets().openFd("exlife.mp3");
+//            soundMap.put(Sound.EXLIFE, soundpool.load(descriptor, 1));
 
         } catch (Exception e) {
             // panic, crash, fine -- but let me know what happened.
@@ -117,7 +118,8 @@ public class MainActivity extends ActionBarActivity {
      * @return a streamID representing the sound being played
      */
     public int playSound(Sound s, float vol, float rate) {
-        return soundpool.play(soundMap.get(s), vol, vol, 0, 0, rate);
+        return 0;
+//        return soundpool.play(soundMap.get(s), vol, vol, 0, 0, rate);
     }
     public int playSound(Sound s) {
         return playSound(s, 0.9f, 1);
@@ -128,7 +130,7 @@ public class MainActivity extends ActionBarActivity {
      * @param streamID
      */
     public void stopSound(int streamID) {
-        soundpool.stop(streamID);
+//        soundpool.stop(streamID);
     }
     /**
      * Handle resuming of the game,
@@ -202,6 +204,23 @@ public class MainActivity extends ActionBarActivity {
             holder = getHolder();
             currentScreen = entryScreen;
             setOnTouchListener(this);
+
+            setFocusableInTouchMode(true);
+            requestFocus();
+
+            setOnGenericMotionListener(new View.OnGenericMotionListener() {
+                @Override
+                public boolean onGenericMotion(View view, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_SCROLL
+                            && RotaryEncoder.isFromRotaryEncoder(event)) {
+
+                        currentScreen.onRotaryInput(event);
+                        return true;
+                    }
+
+                    return false;
+                }
+            });
         }
 
         public void resume() {

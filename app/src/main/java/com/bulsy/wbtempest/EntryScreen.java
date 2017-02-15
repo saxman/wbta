@@ -12,7 +12,6 @@ import android.view.VelocityTracker;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -79,8 +78,8 @@ public class EntryScreen extends Screen {
         int height = v.getHeight();
         int thmsize_y=0;
 
-        String playmsg = act.getResources().getString(R.string.play);
-        String exitmsg = act.getResources().getString(R.string.exitapp);
+//        String playmsg = act.getResources().getString(R.string.play);
+//        String exitmsg = act.getResources().getString(R.string.exitapp);
 
         // draw the screen
         c.drawRGB(0, 0, 0);
@@ -110,8 +109,8 @@ public class EntryScreen extends Screen {
             if (startscreensBmp != null)
                 startscreensBmp.recycle();
             startscreensBmp = Bitmap.createBitmap(thmsize * act.maxStartLevel,
-                                                         thmsize_y,
-                                                         Bitmap.Config.ARGB_8888);
+                    thmsize_y,
+                    Bitmap.Config.ARGB_8888);
             Canvas cvs = new Canvas(startscreensBmp);
             for (int i = 0; i < screenThumbnails.size(); i++) {
                 Bitmap scrbmp = screenThumbnails.get(i);
@@ -144,24 +143,24 @@ public class EntryScreen extends Screen {
             c.drawText(act.lblSelectStartScr, (width - p.measureText(act.lblSelectStartScr)) / 2, (int) (height / 2.2), p);
         }
 
-        p.setTextSize(act.TS_BIG);
-        if (playBtnBounds == null) {
-            // initialize button locations
-            p.getTextBounds(playmsg, 0, playmsg.length() - 1, scaledDst);
-            // weirdly, and annoyingly, the bounds we create magically move and shrink.
-            // so...uh....compensate by making the expected touch area bigger.
-            playBtnBounds = new Rect(width/4 - scaledDst.width(),
-                    height *3/4 - scaledDst.height(),
-                    width/4 + scaledDst.width(),
-                    height *3/4 + scaledDst.height());
-            p.getTextBounds(exitmsg, 0, exitmsg.length() - 1, scaledDst);
-            exitBtnBounds = new Rect(width*3/4 - scaledDst.width(),
-                    height *3/4 - scaledDst.height(),
-                    width*3/4 + scaledDst.width(),
-                    height *3/4 + scaledDst.height());
-        }
-        c.drawText(playmsg, playBtnBounds.left, playBtnBounds.bottom, p);
-        c.drawText(exitmsg, exitBtnBounds.left, exitBtnBounds.bottom, p);
+//        p.setTextSize(act.TS_BIG);
+//        if (playBtnBounds == null) {
+//            // initialize button locations
+//            p.getTextBounds(playmsg, 0, playmsg.length() - 1, scaledDst);
+//            // weirdly, and annoyingly, the bounds we create magically move and shrink.
+//            // so...uh....compensate by making the expected touch area bigger.
+//            playBtnBounds = new Rect(width/4 - scaledDst.width(),
+//                    height *3/4 - scaledDst.height(),
+//                    width/4 + scaledDst.width(),
+//                    height *3/4 + scaledDst.height());
+//            p.getTextBounds(exitmsg, 0, exitmsg.length() - 1, scaledDst);
+//            exitBtnBounds = new Rect(width*3/4 - scaledDst.width(),
+//                    height *3/4 - scaledDst.height(),
+//                    width*3/4 + scaledDst.width(),
+//                    height *3/4 + scaledDst.height());
+//        }
+//        c.drawText(playmsg, playBtnBounds.left, playBtnBounds.bottom, p);
+//        c.drawText(exitmsg, exitBtnBounds.left, exitBtnBounds.bottom, p);
 
         // version line
         p.setTextSize(act.TS_NORMAL);
@@ -187,12 +186,15 @@ public class EntryScreen extends Screen {
                     mVelocityTracker.addMovement(e);
                 }
                 else {
-                    if (playBtnBounds.contains((int) e.getX(), (int) e.getY())) {
-                        int startlevel = (int)(screensBmpOffset+2) / thmsize +1;  // overcome rounding error, and convert screen num to level num
-                        act.startGame(startlevel);
-                    }
-                    if (exitBtnBounds.contains((int) e.getX(), (int) e.getY()))
-                        act.exit();
+                    int startlevel = (int)(screensBmpOffset+2) / thmsize +1;  // overcome rounding error, and convert screen num to level num
+                    act.startGame(startlevel);
+
+//                    if (playBtnBounds.contains((int) e.getX(), (int) e.getY())) {
+//                        int startlevel = (int)(screensBmpOffset+2) / thmsize +1;  // overcome rounding error, and convert screen num to level num
+//                        act.startGame(startlevel);
+//                    }
+//                    if (exitBtnBounds.contains((int) e.getX(), (int) e.getY()))
+//                        act.exit();
 
                     // we don't care about followup events for buttons in this screen
                     return false;
@@ -217,4 +219,6 @@ public class EntryScreen extends Screen {
         return true;
     }
 
+    @Override
+    public void onRotaryInput(MotionEvent event) {}
 }
